@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversation Details</title>
+</head>
+<body>
+    <h1>{{ conversation.title }}</h1>
+    <p>User: {{ conversation.user_name }}</p>
+    <p>Date: {{ conversation.created_at }}</p>
+
+    {% if user.is_authenticated %}
+        <h2>Messages:</h2>
+        <ul>
+            {% for message in conversation.messages.all %}
+                <li><strong>{{ message.sender }}:</strong> {{ message.message }} <em>({{ message.created_at }})</em></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You need to <a href="{% url 'login' %}">login</a> to view the conversation details.</p>
+    {% endif %}
+</body>
+</html>

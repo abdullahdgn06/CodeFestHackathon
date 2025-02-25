@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Conversations List</title>
+</head>
+<body>
+    <h1>Past Conversations</h1>
+
+    {% if user.is_authenticated %}
+        <ul>
+            {% for conversation in conversations %}
+                <li>
+                    <a href="{% url 'conversation_detail' conversation.id %}">
+                        {{ conversation.title }} ({{ conversation.created_at }})
+                    </a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>You need to <a href="{% url 'login' %}">login</a> to view your conversations.</p>
+    {% endif %}
+</body>
+</html>
