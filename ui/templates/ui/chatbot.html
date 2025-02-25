@@ -7,17 +7,433 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="{% static 'style.css' %}" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
-        integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <title>TherapyZ</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>TherapyZ - Sohbet</title>
+    <style>
+        :root {
+            --primary-color: #2c5530;
+            --secondary-color: #427d4a;
+            --bg-color: #f0f2f5;
+            --text-color: #1a1a1a;
+            --sidebar-width: 300px;
+            --header-height: 60px;
+            --message-bg-user: #2c5530;
+            --message-bg-assistant: #ffffff;
+            --message-text-user: #ffffff;
+            --message-text-assistant: #1a1a1a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            height: 100vh;
+            overflow: hidden;
+            color: var(--text-color);
+        }
+
+        #sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: var(--sidebar-width);
+            background: white;
+            border-right: 1px solid rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            z-index: 1000;
+        }
+
+        #sidebar.hidden {
+            transform: translateX(calc(-1 * var(--sidebar-width)));
+        }
+
+        #sidebar-trigger {
+            position: fixed;
+            left: 0;
+            top: 0;
+            bottom: 0;
+            width: 10px;
+            z-index: 999;
+            cursor: pointer;
+        }
+
+        #sidebar.hidden:hover,
+        #sidebar-trigger:hover + #sidebar.hidden {
+            transform: translateX(0);
+        }
+
+        .float-top {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+        }
+
+        .sidebar-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .new-chat {
+            flex: 1;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+            font-weight: 500;
+        }
+
+        .new-chat:hover {
+            background: var(--secondary-color);
+        }
+
+        .hide-sidebar {
+            background: transparent;
+            border: 1px solid var(--primary-color);
+            color: var(--primary-color);
+            border-radius: 8px;
+            width: 42px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .hide-sidebar:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .conversations {
+            flex: 1;
+            overflow-y: auto;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .conversations li {
+            margin-bottom: 0.5rem;
+            position: relative;
+        }
+
+        .conversation-button {
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem;
+            border: none;
+            background: transparent;
+            border-radius: 8px;
+            color: var(--text-color);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+            font-size: 0.95rem;
+        }
+
+        .conversation-button:hover {
+            background: rgba(44, 85, 48, 0.1);
+        }
+
+        .conversation-button.active {
+            background: rgba(44, 85, 48, 0.15);
+            color: var(--primary-color);
+            font-weight: 500;
+        }
+
+        .edit-buttons {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: none;
+        }
+
+        .conversations li:hover .edit-buttons {
+            display: flex;
+            gap: 0.25rem;
+        }
+
+        .delete-conversation {
+            background: transparent;
+            border: none;
+            color: #dc3545;
+            padding: 0.25rem;
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+
+        .delete-conversation:hover {
+            background: rgba(220, 53, 69, 0.1);
+        }
+
+        main {
+            margin-left: var(--sidebar-width);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            transition: margin-left 0.3s ease;
+            background-color: var(--bg-color);
+        }
+
+        #sidebar.hidden + main {
+            margin-left: 0;
+        }
+
+        .view {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+
+        .logo {
+            text-align: center;
+            color: var(--primary-color);
+        }
+
+        .logo i {
+            font-size: 3.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .logo h2 {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        #response-container {
+            flex: 1;
+            width: 100%;
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 2rem;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .message {
+            display: flex;
+            gap: 1rem;
+            padding: 1.25rem;
+            border-radius: 18px;
+            max-width: 80%;
+            position: relative;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            transition: all 0.2s ease;
+        }
+
+        .message:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .message.user {
+            align-self: flex-end;
+            background: linear-gradient(135deg, var(--message-bg-user) 0%, #1e3d22 100%);
+            color: var(--message-text-user);
+            margin-left: auto;
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant {
+            align-self: flex-start;
+            background: var(--message-bg-assistant);
+            color: var(--message-text-assistant);
+            border: 1px solid rgba(0,0,0,0.1);
+            border-bottom-left-radius: 4px;
+        }
+
+        .message .content {
+            flex: 1;
+            font-size: 1rem;
+            line-height: 1.6;
+            letter-spacing: 0.2px;
+        }
+
+        .message .content p {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        .identity {
+            display: flex;
+            align-items: flex-start;
+            padding-top: 0.25rem;
+            min-width: 35px;
+        }
+
+        .user-icon {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+            border: 2px solid #fff;
+            transition: all 0.2s ease;
+        }
+
+        .message:hover .user-icon {
+            transform: scale(1.05);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .user-message-icon {
+            background: rgb(0, 0, 0);
+            color: var(--primary-color);
+        }
+
+        .assistant-message-icon {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .message.user {
+            flex-direction: row-reverse;
+            padding-right: 1.5rem;
+        }
+
+        .message.assistant {
+            padding-left: 1.5rem;
+        }
+
+        .message.user .content {
+            margin-right: 0.5rem;
+        }
+
+        .message.assistant .content {
+            margin-left: 0.5rem;
+        }
+
+        /* Mesaj zamanı için stil */
+        .message::after {
+            content: attr(data-time);
+            position: absolute;
+            bottom: 0.4rem;
+            font-size: 0.75rem;
+            opacity: 0.7;
+        }
+
+        .message.user::after {
+            right: 1.5rem;
+            color: rgba(255,255,255,0.8);
+        }
+
+        .message.assistant::after {
+            left: 1.5rem;
+            color: rgba(0,0,0,0.5);
+        }
+
+        /* Mesaj input alanı */
+        .message-wrapper {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            gap: 1rem;
+            background: var(--bg-color);
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border: 1px solid rgba(0,0,0,0.1);
+            transition: all 0.2s ease;
+        }
+
+        .message-wrapper:focus-within {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-color: var(--primary-color);
+        }
+
+        #message {
+            flex: 1;
+            border: none;
+            background: transparent;
+            resize: none;
+            padding: 0.75rem;
+            font-size: 1rem;
+            line-height: 1.5;
+            max-height: 200px;
+            outline: none;
+            color: var(--text-color);
+        }
+
+        #message::placeholder {
+            color: #888;
+        }
+
+        .send-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
+        .send-button:hover {
+            background: var(--secondary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        }
+
+        .send-button:active {
+            transform: translateY(0);
+        }
+
+        .send-button i {
+            font-size: 1.2rem;
+        }
+
+        /* Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0,0,0,0.2);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0,0,0,0.3);
+        }
+    </style>
 </head>
 
 <body>
+    <div id="sidebar-trigger"></div>
     <nav id="sidebar">
         <div class="float-top">
             <div class="sidebar-controls">
-                <button class="new-chat"><i class="fa fa-plus"></i> New chat</button>
+                <button class="new-chat"><i class="fa fa-plus"></i> Yeni Sohbet</button>
                 <button class="hide-sidebar"><i class="fa fa-chevron-left"></i></button>
             </div>
             <ul class="conversations">
@@ -26,13 +442,14 @@
                     <button class="conversation-button" data-id="{{ conversation.id }}">
                         <i class="fa fa-message fa-regular"></i> {{ conversation.title }}
                     </button>
-                    <div class="fade"></div>
                     <div class="edit-buttons">
-                        <button class="delete-conversation" data-id="{{ conversation.id }}"><i class="fa fa-trash"></i></button>
+                        <button class="delete-conversation" data-id="{{ conversation.id }}" title="Sohbeti Sil">
+                            <i class="fa fa-trash"></i>
+                        </button>
                     </div>
                 </li>
                 {% empty %}
-                <li>No conversations yet.</li>
+                <li class="text-center text-muted p-3">Henüz sohbet bulunmuyor.</li>
                 {% endfor %}
             </ul>
         </div>
@@ -40,8 +457,10 @@
 
     <main>
         <div class="view new-chat-view">
-            <div class="logo"><br>
-                <small>Merhaba {{ user.username }}, TherapyZ' e hoşgeldin!</small>
+            <div class="logo">
+                <i class="fas fa-brain"></i>
+                <h2>TherapyZ'ye Hoş Geldiniz</h2>
+                <p class="text-muted">Merhaba {{ user.username }}, size nasıl yardımcı olabilirim?</p>
             </div>
         </div>
 
@@ -51,17 +470,23 @@
 
         <div id="message-form">
             <div class="message-wrapper">
-                <textarea id="message" rows="1" placeholder="Send a message"></textarea>
-                <button class="send-button"><i class="fa fa-paper-plane"></i></button>
+                <textarea id="message" rows="1" placeholder="Mesajınızı yazın..."></textarea>
+                <button class="send-button" title="Gönder"><i class="fa fa-paper-plane"></i></button>
             </div>
         </div>
     </main>
 
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         $(document).ready(function () {
             let currentConversationId = null;
             let isNewChat = true;
+
+            // Sidebar toggle işlevi
+            $(".hide-sidebar").on("click", function() {
+                $("#sidebar").toggleClass("hidden");
+            });
 
             // Yeni sohbet başlatma
             $(".new-chat").on("click", function() {
@@ -77,20 +502,14 @@
             $(".conversation-button").on("click", function() {
                 const button = $(this);
                 const conversationId = button.data("id");
-                currentConversationId = conversationId; // Aktif sohbet ID'sini güncelle
+                currentConversationId = conversationId;
                 isNewChat = false;
 
-                // Aktif sohbeti vurgula
                 $(".conversation-button").removeClass("active");
                 button.addClass("active");
-                
-                // Yeni sohbet görünümünü gizle
                 $(".new-chat-view").hide();
-
-                // Mesaj alanını aktif et
                 $("#message").prop("disabled", false).focus();
 
-                // Sohbet geçmişini yükle
                 $("#response-container").empty();
                 fetch(`/conversation/${conversationId}/messages/`)
                     .then(response => response.json())
@@ -98,17 +517,17 @@
                         data.messages.forEach(message => {
                             const isUser = message.sender !== "ChatBot";
                             $("#response-container").append(`
-                                <div class="message ${isUser ? 'user' : 'assistant'} message">
+                                <div class="message ${isUser ? 'user' : 'assistant'}">
                                     ${!isUser ? `<div class="identity">
                                         <i class="assistant-message-icon user-icon">B</i>
                                     </div>` : ''}
-                                    <div class="content">
-                                        <p>${message.message}</p>
-                                    </div>
+                                            <div class="content">
+                                                <p>${message.message}</p>
+                                            </div>
                                     ${isUser ? `<div class="identity">
                                         <i class="user-message-icon user-icon">${message.sender.charAt(0).toUpperCase()}</i>
                                     </div>` : ''}
-                                </div>
+                                        </div>
                             `);
                         });
                         $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
@@ -137,26 +556,23 @@
             });
 
             // Mesaj gönderme
-            $(".send-button").on("click", function () {
+            function sendMessage() {
                 var message = $("#message").val().trim();
                 if (message) {
-                    // Kullanıcı mesajını hemen göster
                     $("#response-container").append(`
-                        <div class="message user message">
-                            <div class="content">
+                        <div class="message user">
+                                            <div class="content">
                                 <p>${message}</p>
-                            </div>
-                            <div class="identity">
+                                            </div>
+                                            <div class="identity">
                                 <i class="user-message-icon user-icon">${'{{ user.username }}'.charAt(0).toUpperCase()}</i>
                             </div>
-                        </div>
+                                            </div>
                     `);
 
-                    // Mesaj kutusunu temizle ve scroll'u en alta çek
-                    $("#message").val("");
+                    $("#message").val("").css("height", "auto");
                     $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
 
-                    // API'ye istek gönder
                     $.ajax({
                         url: "{% url 'chatbot_reply' %}",
                         method: "POST",
@@ -165,10 +581,8 @@
                             conversation_id: currentConversationId
                         },
                         success: function (response) {
-                            // Konuşma ID'sini güncelle
                             currentConversationId = response.conversation_id;
                             
-                            // Yeni sohbet ise sidebar'a ekle
                             if (isNewChat) {
                                 isNewChat = false;
                                 const newConversation = `
@@ -176,9 +590,8 @@
                                         <button class="conversation-button" data-id="${response.conversation_id}">
                                             <i class="fa fa-message fa-regular"></i> ${message.substring(0, 50)}...
                                         </button>
-                                        <div class="fade"></div>
                                         <div class="edit-buttons">
-                                            <button class="delete-conversation" data-id="${response.conversation_id}">
+                                            <button class="delete-conversation" data-id="${response.conversation_id}" title="Sohbeti Sil">
                                                 <i class="fa fa-trash"></i>
                                             </button>
                                         </div>
@@ -186,7 +599,6 @@
                                 `;
                                 $(".conversations").prepend(newConversation);
                                 
-                                // Yeni eklenen sohbet butonuna click event listener ekle
                                 $(".conversation-button").first().on("click", function() {
                                     const button = $(this);
                                     currentConversationId = button.data("id");
@@ -196,7 +608,6 @@
                                     $(".new-chat-view").hide();
                                 });
                                 
-                                // Yeni eklenen silme butonuna click event listener ekle
                                 $(".delete-conversation").first().on("click", function(e) {
                                     e.stopPropagation();
                                     const conversationId = $(this).data("id");
@@ -218,9 +629,8 @@
                                 });
                             }
 
-                            // Bot cevabını göster
                             $("#response-container").append(`
-                                <div class="message assistant message">
+                                <div class="message assistant">
                                     <div class="identity">
                                         <i class="assistant-message-icon user-icon">B</i>
                                     </div>
@@ -230,7 +640,6 @@
                                 </div>
                             `);
 
-                            // Scroll'u en alta çek
                             $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
                         },
                         error: function (xhr, status, error) {
@@ -242,7 +651,7 @@
                             $("#response-container").append(`
                                 <div class="message error">
                                     <div class="content">
-                                        <p style="color: red;">Hata: ${errorMessage}</p>
+                                        <p>${errorMessage}</p>
                                     </div>
                                 </div>
                             `);
@@ -251,13 +660,21 @@
                         }
                     });
                 }
-            });
+            }
+
+            $(".send-button").on("click", sendMessage);
 
             $("#message").on("keypress", function (event) {
                 if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
-                    $(".send-button").click();
+                    sendMessage();
                 }
+            });
+
+            // Textarea otomatik yükseklik ayarı
+            $("#message").on("input", function() {
+                this.style.height = "auto";
+                this.style.height = (this.scrollHeight) + "px";
             });
 
             // Sayfa yüklendiğinde yeni sohbet başlat
