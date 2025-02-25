@@ -46,7 +46,7 @@
                 <small>Merhaba {{ user.username }}, TherapyZ' e hoşgeldin!</small>
             </div>
         </div>
-        
+
         <!-- Container for showing the response -->
         <div id="response-container">
             <!-- Responses will appear here -->
@@ -65,65 +65,93 @@
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script src="{% static 'script.js' %}"></script>
 
-    <script>
-        $(document).ready(function () {
-            $(".send-button").on("click", function () {
-                var message = $("#message").val().trim();
+   <script>
+    $(document).ready(function () {
+        let currentConversationId = null;
 
-                if (message) {
-                    // Display the sent message
-                    $("#response-container").append(`<div class="user-message">${message}</div>`);
-                    $("#message").val(""); // Clear the message input
-
-                    // Prepare the data for the API request
-                    var data = {
-                        "model": "turkish-llama-8b-instruct-v0.1",
-                        "messages": [
-                            {
-                                "role": "system",
-                                "content": "Sen uzman bir psikologsun. Türkçe konuşuyorsun. Terapi yapıyorsun. Adım adım sohbeti ilerlet ve öneri ver. Hastalarına en uygun cevapları veriyorsun."
-                            },
-                            {
-                                "role": "user",
-                                "content": message
-                            }
-                        ],
-                        "temperature": 0.7,
-                        "max_tokens": -1,
-                        "stream": false
-                    };
-
-                    // Send the message via AJAX
-                    $.ajax({
-                        url: "http://10.95.48.119:1234/v1/chat/completions",  // Your external API endpoint
-                        method: "POST",
-                        contentType: "application/json",  // Send as JSON
-                        data: JSON.stringify(data),  // Stringify the JSON data
-                        success: function (response) {
-                            // Check the response structure and extract the bot's reply
-                            if (response && response.choices && response.choices[0]) {
-                                var botResponse = response.choices[0].message.content;
-                                $("#response-container").append(`<div class="bot-response">${botResponse}</div>`);
-                            } else {
-                                $("#response-container").append('<div class="bot-response">Sorry, no valid response from the bot.</div>');
-                            }
-                        },
-                        error: function (xhr, status, error) {
-                            console.log("Error:", error);
-                            $("#response-container").append('<div class="bot-response">Sorry, something went wrong.</div>');
-                        }
-                    });
-                }
-            });
-
-            // Optional: Add Enter key to send message
-            $("#message").on("keypress", function (event) {
-                if (event.key === "Enter") {
-                    $(".send-button").click();
-                }
-            });
+        // Yeni sohbet başlatma
+        $(".new-chat").on("click", function() {
+            currentConversationId = null;
+            $("#response-container").empty();
+            $("#message").prop("disabled", false);
         });
-    </script>
+
+        $(".send-button").on("click", function () {
+            var message = $("#message").val().trim();
+
+            if (message) {
+                // Kullanıcı mesajını hemen göster
+                $("#response-container").append(`
+                    <div class="message user message">
+                        <div class="content">
+                            <p>${message}</p>
+                        </div>
+                        <div class="identity">
+                            <i class="user-message-icon user-icon">${'{{ user.username }}'.charAt(0).toUpperCase()}</i>
+                        </div>
+                    </div>
+                `);
+
+                // Mesaj kutusunu temizle ve scroll'u en alta çek
+                $("#message").val("");
+                $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
+
+                // API'ye istek gönder
+                $.ajax({
+                    url: "{% url 'chatbot_reply' %}",
+                    method: "POST",
+                    data: { 
+                        message: message,
+                        conversation_id: currentConversationId
+                    },
+                    success: function (response) {
+                        // Konuşma ID'sini güncelle
+                        currentConversationId = response.conversation_id;
+
+                        // Bot cevabını göster
+                        $("#response-container").append(`
+                            <div class="message assistant message">
+                                <div class="identity">
+                                    <i class="assistant-message-icon user-icon">B</i>
+                                </div>
+                                <div class="content">
+                                    <p>${response.bot_reply}</p>
+                                </div>
+                            </div>
+                        `);
+
+                        // Scroll'u en alta çek
+                        $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
+                    },
+                    error: function (xhr, status, error) {
+                        let errorMessage = 'Bir hata oluştu.';
+                        if (xhr.responseJSON && xhr.responseJSON.error) {
+                            errorMessage = xhr.responseJSON.error;
+                        }
+                        
+                        $("#response-container").append(`
+                            <div class="message error">
+                                <div class="content">
+                                    <p style="color: red;">Hata: ${errorMessage}</p>
+                                </div>
+                            </div>
+                        `);
+                        
+                        console.error('Error:', error);
+                    }
+                });
+            }
+        });
+
+        $("#message").on("keypress", function (event) {
+            if (event.key === "Enter" && !event.shiftKey) {
+                event.preventDefault();
+                $(".send-button").click();
+            }
+        });
+    });
+</script>
+
 </body>
 
 </html>

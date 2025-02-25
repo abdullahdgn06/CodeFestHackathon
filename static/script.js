@@ -1,20 +1,32 @@
-const sidebar = document.querySelector("#sidebar");
-const hide_sidebar = document.querySelector(".hide-sidebar");
-const new_chat_button = document.querySelector(".new-chat");
+document.addEventListener('DOMContentLoaded', function() {
+    const sidebar = document.querySelector("#sidebar");
+    const hideSidebarBtn = document.querySelector(".hide-sidebar");
+    const messageBox = document.querySelector("#message");
 
-hide_sidebar.addEventListener( "click", function() {
-    sidebar.classList.toggle( "hidden" );
-} );
+    // Sidebar toggle functionality
+    hideSidebarBtn.addEventListener("click", function() {
+        sidebar.classList.toggle("hidden");
+        // Save sidebar state to localStorage
+        localStorage.setItem('sidebarHidden', sidebar.classList.contains('hidden'));
+    });
 
-const message_box = document.querySelector("#message");
-
-message_box.addEventListener("keyup", function() {
-    message_box.style.height = "auto";
-    let height = message_box.scrollHeight + 2;
-    if( height > 200 ) {
-        height = 200;
+    // Restore sidebar state from localStorage
+    const sidebarHidden = localStorage.getItem('sidebarHidden') === 'true';
+    if (sidebarHidden) {
+        sidebar.classList.add("hidden");
     }
-    message_box.style.height = height + "px";
+
+    // Message box auto-resize
+    if (messageBox) {
+        messageBox.addEventListener("keyup", function() {
+            messageBox.style.height = "auto";
+            let height = messageBox.scrollHeight + 2;
+            if (height > 200) {
+                height = 200;
+            }
+            messageBox.style.height = height + "px";
+        });
+    }
 });
 
 function show_view( view_selector ) {
@@ -25,6 +37,7 @@ function show_view( view_selector ) {
     document.querySelector(view_selector).style.display = "flex";
 }
 
+const new_chat_button = document.querySelector(".new-chat");
 new_chat_button.addEventListener("click", function() {
     show_view( ".new-chat-view" );
 });
@@ -43,7 +56,7 @@ sendButton.addEventListener("click", () => {
 });
 
 // Allow sending the message by pressing "Enter"
-message_box.addEventListener("keydown", function(e) {
+messageBox.addEventListener("keydown", function(e) {
     if (e.key === "Enter" && !e.shiftKey) { // Check if "Enter" is pressed (not Shift + Enter)
         e.preventDefault(); // Prevent the default behavior of creating a new line
         messageForm.dispatchEvent(new Event("submit")); // Trigger the form submit

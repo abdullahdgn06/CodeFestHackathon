@@ -18,3 +18,16 @@ class Message(models.Model):
 
     def __str__(self):
         return f"Message from {self.sender.username} at {self.created_at}"
+
+
+class PsychologicalSurvey(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    stress_level = models.IntegerField()
+    anxiety_level = models.IntegerField()
+    depression_level = models.IntegerField()
+    sleep_quality = models.IntegerField()
+    life_satisfaction = models.IntegerField()
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Survey for {self.user.username}"
