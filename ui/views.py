@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render, get_object_or_404, redirect
-from django.http import JsonResponse
+from django.http import JsonResponse, StreamingHttpResponse
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
@@ -9,6 +9,7 @@ from .models import Conversation, Message, PsychologicalSurvey
 from django.contrib.auth.models import User
 from django.contrib import messages
 from django.contrib.auth import update_session_auth_hash
+import json
 
 
 # Anasayfa view'i
@@ -90,7 +91,7 @@ from langchain.memory import ConversationBufferMemory
 from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 # API ve Model Ayarları
-API_URL = "http://10.95.48.119:1234/v1/chat/completions"
+API_URL = "http://localhost:1234/v1/chat/completions"
 MODEL_NAME = "therapyz-llama-3-8b"
 
 # Django Session ile LangChain Memory Yönetimi
@@ -162,10 +163,9 @@ def chatbot_reply(request):
                     pass
             
             if not conversation:
-                # Yeni konuşma oluşturulduğunda, yeni bir memory başlat
                 conversation = Conversation.objects.create(
                     user=user if user.is_authenticated else None,
-                    title=user_message[:50] + "..."  # İlk mesajı başlık olarak kullan
+                    title=user_message[:50] + "..."
                 )
 
             # Kullanıcı mesajını veritabanına kaydet
@@ -192,37 +192,57 @@ def chatbot_reply(request):
                 "messages": formatted_messages,
                 "temperature": 0.3,
                 "max_tokens": 256,
-                "stream": False,
+                "stream": True,  # Stream'i aktif hale getir
             }
 
-            try:
-                response = requests.post(API_URL, json=payload)
-                response.raise_for_status()  # HTTP hatalarını yakala
-                
-                bot_reply = response.json()["choices"][0]["message"]["content"]
-                
-                # Bot yanıtını LangChain memory'ye ekle
-                memory.chat_memory.add_message(AIMessage(content=bot_reply))
-                
-                # Memory'yi session'a kaydet
-                save_to_session(session, memory, memory_key)
-                
-                # Bot mesajını veritabanına kaydet
-                Message.objects.create(
-                    conversation=conversation,
-                    sender=User.objects.get(username='ChatBot'),
-                    message=bot_reply
-                )
+            def generate_stream():
+                try:
+                    response = requests.post(API_URL, json=payload, stream=True)
+                    response.raise_for_status()
+                    
+                    complete_response = ""
+                    
+                    for line in response.iter_lines():
+                        if line:
+                            line = line.decode('utf-8')
+                            if line.startswith('data: '):
+                                try:
+                                    json_str = line[6:]  # 'data: ' prefix'ini kaldır
+                                    if json_str.strip() == '[DONE]':
+                                        break
+                                    
+                                    json_data = json.loads(json_str)
+                                    if 'choices' in json_data and len(json_data['choices']) > 0:
+                                        delta = json_data['choices'][0].get('delta', {})
+                                        if 'content' in delta:
+                                            content = delta['content']
+                                            complete_response += content
+                                            yield f"data: {json.dumps({'content': content, 'type': 'token'})}\n\n"
+                                except json.JSONDecodeError:
+                                    continue
 
-                return JsonResponse({
-                    'bot_reply': bot_reply,
-                    'conversation_id': conversation.id
-                })
+                    # Tüm yanıt tamamlandığında, veritabanına kaydet
+                    if complete_response:
+                        Message.objects.create(
+                            conversation=conversation,
+                            sender=User.objects.get(username='ChatBot'),
+                            message=complete_response
+                        )
+                        
+                        # Memory'yi güncelle
+                        memory.chat_memory.add_message(AIMessage(content=complete_response))
+                        save_to_session(session, memory, memory_key)
+                        
+                        # Final mesajını gönder
+                        yield f"data: {json.dumps({'content': complete_response, 'type': 'complete', 'conversation_id': conversation.id})}\n\n"
                 
-            except requests.RequestException as e:
-                return JsonResponse({
-                    'error': f'API request failed: {str(e)}'
-                }, status=500)
+                except Exception as e:
+                    yield f"data: {json.dumps({'error': str(e)})}\n\n"
+
+            return StreamingHttpResponse(
+                generate_stream(),
+                content_type='text/event-stream'
+            )
                 
         except Exception as e:
             return JsonResponse({

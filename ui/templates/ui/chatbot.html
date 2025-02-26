@@ -429,6 +429,7 @@
 </head>
 
 <body>
+    {% csrf_token %}
     <div id="sidebar-trigger"></div>
     <nav id="sidebar">
         <div class="float-top">
@@ -556,118 +557,105 @@
             });
 
             // Mesaj gönderme
-            function sendMessage() {
+            $(".send-button").on("click", function () {
                 var message = $("#message").val().trim();
+
                 if (message) {
+                    // Kullanıcı mesajını hemen göster
                     $("#response-container").append(`
                         <div class="message user">
-                                            <div class="content">
+                            <div class="content">
                                 <p>${message}</p>
-                                            </div>
-                                            <div class="identity">
+                            </div>
+                            <div class="identity">
                                 <i class="user-message-icon user-icon">${'{{ user.username }}'.charAt(0).toUpperCase()}</i>
                             </div>
-                                            </div>
+                        </div>
                     `);
 
                     $("#message").val("").css("height", "auto");
                     $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
 
-                    $.ajax({
-                        url: "{% url 'chatbot_reply' %}",
-                        method: "POST",
-                        data: { 
-                            message: message,
-                            conversation_id: currentConversationId
+                    // Bot yanıtı için div oluştur
+                    const botResponseDiv = $(`
+                        <div class="message assistant">
+                            <div class="identity">
+                                <i class="assistant-message-icon user-icon">B</i>
+                            </div>
+                            <div class="content">
+                                <p></p>
+                            </div>
+                        </div>
+                    `);
+                    $("#response-container").append(botResponseDiv);
+
+                    // CSRF token al
+                    const csrftoken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+
+                    // Fetch API ile stream'i al
+                    fetch("{% url 'chatbot_reply' %}", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded',
+                            'X-CSRFToken': csrftoken
                         },
-                        success: function (response) {
-                            currentConversationId = response.conversation_id;
-                            
-                            if (isNewChat) {
-                                isNewChat = false;
-                                const newConversation = `
-                                    <li>
-                                        <button class="conversation-button" data-id="${response.conversation_id}">
-                                            <i class="fa fa-message fa-regular"></i> ${message.substring(0, 50)}...
-                                        </button>
-                                        <div class="edit-buttons">
-                                            <button class="delete-conversation" data-id="${response.conversation_id}" title="Sohbeti Sil">
-                                                <i class="fa fa-trash"></i>
-                                            </button>
-                                        </div>
-                                    </li>
-                                `;
-                                $(".conversations").prepend(newConversation);
+                        body: `message=${encodeURIComponent(message)}&conversation_id=${currentConversationId || ''}`,
+                    }).then(response => {
+                        const reader = response.body.getReader();
+                        const decoder = new TextDecoder();
+                        let fullResponse = '';
+
+                        function readStream() {
+                            reader.read().then(({done, value}) => {
+                                if (done) {
+                                    return;
+                                }
+
+                                const chunk = decoder.decode(value);
+                                const lines = chunk.split('\n');
                                 
-                                $(".conversation-button").first().on("click", function() {
-                                    const button = $(this);
-                                    currentConversationId = button.data("id");
-                                    isNewChat = false;
-                                    $(".conversation-button").removeClass("active");
-                                    button.addClass("active");
-                                    $(".new-chat-view").hide();
-                                });
-                                
-                                $(".delete-conversation").first().on("click", function(e) {
-                                    e.stopPropagation();
-                                    const conversationId = $(this).data("id");
-                                    if (confirm("Bu sohbeti silmek istediğinizden emin misiniz?")) {
-                                        $.ajax({
-                                            url: `/delete_conversation/${conversationId}/`,
-                                            method: "POST",
-                                            success: function() {
-                                                $(`.conversation-button[data-id="${conversationId}"]`).closest("li").remove();
-                                                if (currentConversationId === conversationId) {
-                                                    $(".new-chat").click();
-                                                }
-                                            },
-                                            error: function() {
-                                                alert("Sohbet silinirken bir hata oluştu.");
+                                lines.forEach(line => {
+                                    if (line.startsWith('data: ')) {
+                                        try {
+                                            const data = JSON.parse(line.slice(6));
+                                            
+                                            if (data.error) {
+                                                botResponseDiv.find('.content p').html(`<span style="color: red;">Error: ${data.error}</span>`);
+                                                return;
                                             }
-                                        });
+
+                                            if (data.type === 'token') {
+                                                fullResponse += data.content;
+                                                botResponseDiv.find('.content p').text(fullResponse);
+                                                $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
+                                            } else if (data.type === 'complete') {
+                                                currentConversationId = data.conversation_id;
+                                            }
+                                        } catch (e) {
+                                            console.error('JSON parse error:', e);
+                                        }
                                     }
                                 });
-                            }
 
-                            $("#response-container").append(`
-                                <div class="message assistant">
-                                    <div class="identity">
-                                        <i class="assistant-message-icon user-icon">B</i>
-                                    </div>
-                                    <div class="content">
-                                        <p>${response.bot_reply}</p>
-                                    </div>
-                                </div>
-                            `);
-
-                            $("#response-container").scrollTop($("#response-container")[0].scrollHeight);
-                        },
-                        error: function (xhr, status, error) {
-                            let errorMessage = 'Bir hata oluştu.';
-                            if (xhr.responseJSON && xhr.responseJSON.error) {
-                                errorMessage = xhr.responseJSON.error;
-                            }
-                            
-                            $("#response-container").append(`
-                                <div class="message error">
-                                    <div class="content">
-                                        <p>${errorMessage}</p>
-                                    </div>
-                                </div>
-                            `);
-                            
-                            console.error('Error:', error);
+                                readStream();
+                            }).catch(error => {
+                                console.error('Stream error:', error);
+                                botResponseDiv.find('.content p').html('<span style="color: red;">Error: Connection failed</span>');
+                            });
                         }
+
+                        readStream();
+                    }).catch(error => {
+                        console.error('Fetch error:', error);
+                        botResponseDiv.find('.content p').html('<span style="color: red;">Error: Connection failed</span>');
                     });
                 }
-            }
-
-            $(".send-button").on("click", sendMessage);
+            });
 
             $("#message").on("keypress", function (event) {
                 if (event.key === "Enter" && !event.shiftKey) {
                     event.preventDefault();
-                    sendMessage();
+                    $(".send-button").click();
                 }
             });
 
