@@ -1,9 +1,9 @@
 <p align="center">
     <img src="https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/logo.png" align="center" width="30%">
 </p>
-<p align="center"><h1 align="center">CODEFESTHACKATHON - LLMCİNİ</h1></p>
+<p align="center"><h1 align="center">CODEFESTHACKATHON</h1></p>
 <p align="center">
-	<em> TherapyZ, yapay zeka destekli bir psikolojik destek platformudur. Kullanıcılara 7/24 erişilebilir, güvenli ve kişiselleştirilmiş terapi hizmeti sunar. Yapay zeka destekli sohbet sistemi sayesinde, kullanıcıların psikolojik durumlarını değerlendirmelerine ve destek almalarına yardımcı olur. </em>
+	<em> TherapyZ, yapay zeka destekli bir psikolojik destek platformudur. Kullanıcılara 7/24 erişilebilir, güvenli ve kişiselleştirilmiş terapi hizmeti sunar. Yapay zeka destekli sohbet sistemi sayesinde, kullanıcıların psikolojik durumlarını değerlendirmelerine ve destek almalarına yardımcı olur. </em>
 </p>
 <p align="center">
 	<img src="https://img.shields.io/github/license/abdullahdgn06/CodeFestHackathon?style=default&logo=opensourceinitiative&logoColor=white&color=0080ff" alt="license">
@@ -20,7 +20,7 @@
 
 
 ## Teknik Altyapı
-*Kullanılan Teknolojiler*
+**Kullanılan Teknolojiler**
 
 Backend: Django 5.1.6
 
@@ -28,7 +28,7 @@ Frontend: HTML5, CSS3, JavaScript
 
 Veritabanı: SQLite3
 
-AI Model: LLaMA 3 (8B parametreli özel model)
+AI Model: LLaMA 3 (8B parametreli özel model)
 
 API: REST API (Local endpoint: http://0.0.0.0:1234/v1/chat/completions)
 
@@ -53,70 +53,70 @@ API: REST API (Local endpoint: http://0.0.0.0:1234/v1/chat/completions)
 
 
 
-## *Ana Özellikler*
+## **Ana Özellikler**
 
-*1\. Kullanıcı Yönetimi*
+**1\. Kullanıcı Yönetimi**
 
 *   Kayıt olma
     
 
-*   Giriş yapma
+*   Giriş yapma
     
 
-*   Profil yönetimi
+*   Profil yönetimi
     
 
-*   Şifre değiştirme
+*   Şifre değiştirme
 
 ---
 
-*2\. Psikolojik Değerlendirme*
+**2\. Psikolojik Değerlendirme**
 
-*   İlk kayıtta psikolojik durum anketi
+*   İlk kayıtta psikolojik durum anketi
     
 
-*   *5 farklı metrik ölçümü:*
+*   **5 farklı metrik ölçümü:**
     
 ---
-*3\. AI Sohbet Sistemi*
+**3\. AI Sohbet Sistemi**
 
-*   Gerçek zamanlı mesajlaşma
+*   Gerçek zamanlı mesajlaşma
     
 
 *   Stream yanıt sistemi
     
 
-*   Konuşma geçmişi yönetimi
+*   Konuşma geçmişi yönetimi
     
 
-*   Konuşma başlığı otomatik oluşturma
+*   Konuşma başlığı otomatik oluşturma
     
 
-*   Mesaj geçmişi saklama
+*   Mesaj geçmişi saklama
     
 ---
 
-## *Güvenlik Özellikleri*
+## **Güvenlik Özellikleri**
 
-*   *CSRF koruması*
+*   **CSRF koruması**
     
 
-*   *Oturum yönetimi*
+*   **Oturum yönetimi**
     
 
-*   *Şifrelenmiş veri saklama*
+*   **Şifrelenmiş veri saklama**
     
 
-*   *Kullanıcı doğrulama*
+*   **Kullanıcı doğrulama**
     
 
-*   *Güvenli rota yönetimi*
+*   **Güvenli rota yönetimi**
 
 ---
 
 ##  Project Structure
 
-sh
+```sh
 └── CodeFestHackathon/
     ├── README.md
     ├── codefesthackathon
@@ -143,14 +143,14 @@ sh
         ├── tests.py
         ├── urls.py
         └── views.py
-
+```
 
 
 ###  Project Index
 <details open>
 	<summary><b><code>CODEFESTHACKATHON/</code></b></summary>
-	<details> <!-- _root_ Submodule -->
-		<summary><b>_root_</b></summary>
+	<details> <!-- __root__ Submodule -->
+		<summary><b>__root__</b></summary>
 		<blockquote>
 			<table>
 			<tr>
@@ -267,68 +267,68 @@ sh
 </details>
 
 ---
-##  Başlarken
+##  Başlarken
 
-###  Ön Hazırlık
+###  Ön Hazırlık
 
-CodeFestHackathon'a başlamadan önce çalışma zamanı ortamınızın aşağıdaki gereksinimleri karşıladığından emin olun:
+CodeFestHackathon'a başlamadan önce çalışma zamanı ortamınızın aşağıdaki gereksinimleri karşıladığından emin olun:
 
-- *Programming Language:* Python
-- *Package Manager:* Pip
+- **Programming Language:** Python
+- **Package Manager:** Pip
 
 
 ###  Kurulum
 
-Aşağıdaki yöntemlerden birini kullanarak CodeFestHackathon'u yükleyin:
+Aşağıdaki yöntemlerden birini kullanarak CodeFestHackathon'u yükleyin:
 
-*Kaynaktan oluştur:*
+**Kaynaktan oluştur:**
 
 1. Clone the CodeFestHackathon repository:
-sh
+```sh
 ❯ git clone https://github.com/abdullahdgn06/CodeFestHackathon
-
+```
 
 2. Proje dizinine gidin::
-sh
+```sh
 ❯ cd CodeFestHackathon
+```
+
+3. Proje bağımlılıklarını kurun:
 
 
-3. Proje bağımlılıklarını kurun:
+**Using `pip`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
 
-
-**Using pip** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
-
-sh
+```sh
 ❯ pip install -r requirements.txt
-
+```
 
 
 
 
 ###  Kullanım
-Aşağıdaki komutu kullanarak CodeFestHackathon'u çalıştırın:
-**pip** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
+Aşağıdaki komutu kullanarak CodeFestHackathon'u çalıştırın:
+**`pip`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
 
-sh
+```sh
 ❯ python manage.py runserver
+```
 
 
+TherapyZ LLM Modelini çalıştırmak için:
+**`LM Studio`** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
 
-TherapyZ LLM Modelini çalıştırmak için:
-**LM Studio** &nbsp; [<img align="center" src="https://img.shields.io/badge/Pip-3776AB.svg?style={badge_style}&logo=pypi&logoColor=white" />](https://pypi.org/project/pip/)
-
-sh
+```sh
 ❯ python manage.py runserver
+```
 
 
 
+LM Studio için ping:
+**`LM Studio`** &nbsp; 
 
-LM Studio için ping:
-**LM Studio** &nbsp; 
-
-sh
+```sh
 ❯ curl http://0.0.0.0:1234/v1/models/
-
+```
 
 
 
@@ -336,76 +336,77 @@ sh
 
 
 ###  Test
-Aşağıdaki komutu kullanarak test takımını çalıştırın:
-**Using curl** &nbsp;
+Aşağıdaki komutu kullanarak test takımını çalıştırın:
+**Using `curl`** &nbsp;
 
-sh
+```sh
 ❯ curl http://0.0.0.0:1234/v1/chat/completions \
   -H "Content-Type: application/json" \
   -d '{
     "model": "therapyz-llama-3-8b",
     "messages": [
-      { "role": "system", "content": "Sen, terapi yapabilen profesyonel bir psikologsun; kullanıcının duygularını anlamak, farkındalık kazanmasına yardımcı olmak ve bilimsel terapi teknikleriyle rehberlik etmek için buradasın. Kullanıcının paylaştığı durumu empatik bir yaklaşımla dinleyerek açık uçlu ve kısa sorular sor ve yanıt bekle, yanıtları dikkatlice oku ve sohbete devam et. Onun kendini yargılamadan ifade etmesini teşvik et, düşünme biçimlerini keşfetmesine yardımcı ol ve gerektiğinde günlük hayata uygulanabilir öneriler ver. Amacın, kullanıcıya kendi çözümünü bulmasında rehberlik etmek." },
-      { "role": "user", "content": "Sınav haftası yaklaştı ve bu durum beni çok geriyor. }
+      { "role": "system", "content": "Sen, terapi yapabilen profesyonel bir psikologsun; kullanıcının duygularını anlamak, farkındalık kazanmasına yardımcı olmak ve bilimsel terapi teknikleriyle rehberlik etmek için buradasın. Kullanıcının paylaştığı durumu empatik bir yaklaşımla dinleyerek açık uçlu ve kısa sorular sor ve yanıt bekle, yanıtları dikkatlice oku ve sohbete devam et. Onun kendini yargılamadan ifade etmesini teşvik et, düşünme biçimlerini keşfetmesine yardımcı ol ve gerektiğinde günlük hayata uygulanabilir öneriler ver. Amacın, kullanıcıya kendi çözümünü bulmasında rehberlik etmek." },
+      { "role": "user", "content": "Sınav haftası yaklaştı ve bu durum beni çok geriyor. }
     ],
     "temperature": 0.7,
     "max_tokens": -1,
-    "stream": false
+    "stream": false
 }'
-
+```
 
 
 ---
 ##  Project Roadmap
 
-- [X] **Task 1**: Arayüz tasarımı
-- [X] **Task 2**: UI kodlama
-- [X] **Task 3**: Veriseti hazırlığı
-- [X] **Task 4**: LLM finetune 
-- [X] **Task 5**: API yönetimi
-- [X] **Task 3**: Finish
+- [X] **`Task 1`**: Arayüz tasarımı
+- [X] **`Task 2`**: UI kodlama
+- [X] **`Task 3`**: Veriseti hazırlığı
+- [X] **`Task 4`**: LLM finetune 
+- [X] **`Task 5`**: API yönetimi
+- [X] **`Task 3`**: Finish
 ---
 
 ##  Contributing
 
-- *💬 [Join the Discussions](https://github.com/abdullahdgn06/CodeFestHackathon/discussions)*: Görüşlerinizi paylaşın, geri bildirimde bulunun veya soru sorun.
-- *🐛 [Report Issues](https://github.com/abdullahdgn06/CodeFestHackathon/issues)*: CodeFestHackathon projesi için bulunan hataları bildirin veya özellik isteklerini kaydedin.
-- *💡 [Submit Pull Requests](https://github.com/abdullahdgn06/CodeFestHackathon/blob/main/CONTRIBUTING.md)*: Açık PR'leri inceleyin ve kendi PR'lerinizi gönderin.
+- **💬 [Join the Discussions](https://github.com/abdullahdgn06/CodeFestHackathon/discussions)**: Görüşlerinizi paylaşın, geri bildirimde bulunun veya soru sorun.
+- **🐛 [Report Issues](https://github.com/abdullahdgn06/CodeFestHackathon/issues)**: `CodeFestHackathon` projesi için bulunan hataları bildirin veya özellik isteklerini kaydedin.
+- **💡 [Submit Pull Requests](https://github.com/abdullahdgn06/CodeFestHackathon/blob/main/CONTRIBUTING.md)**: Açık PR'leri inceleyin ve kendi PR'lerinizi gönderin.
 
 
 ### <summary>Contributing Guidelines</summary>
 
-1. *Fork the Repository*: Öncelikle proje deposunu GitHub hesabınıza aktarın.
-2. *Clone Locally*: Çatallanmış deponuzu bir git istemcisi kullanarak yerel makinenize kopyalayın
-   sh
+1. **Fork the Repository**: Öncelikle proje deposunu GitHub hesabınıza aktarın.
+2. **Clone Locally**: Çatallanmış deponuzu bir git istemcisi kullanarak yerel makinenize kopyalayın
+   ```sh
    git clone https://github.com/abdullahdgn06/CodeFestHackathon
-   
-3. *Create a New Branch*: Her zaman yeni bir dal üzerinde çalışın ve ona açıklayıcı bir isim verin.
-   sh
+   ```
+3. **Create a New Branch**: Her zaman yeni bir dal üzerinde çalışın ve ona açıklayıcı bir isim verin.
+   ```sh
    git checkout -b new-feature-x
-   
-4. *Make Your Changes*: Değişikliklerinizi yerel olarak geliştirin ve test edin.
-5. *Commit Your Changes*: Güncellemelerinizi açıklayan net bir mesajla taahhütte bulunun.
-   sh
+   ```
+4. **Make Your Changes**: Değişikliklerinizi yerel olarak geliştirin ve test edin.
+5. **Commit Your Changes**: Güncellemelerinizi açıklayan net bir mesajla taahhütte bulunun.
+   ```sh
    git commit -m 'Implemented new feature x.'
-   
-6. *Push to github*: Değişiklikleri çatallı deponuza gönderin.
-   sh
+   ```
+6. **Push to github**: Değişiklikleri çatallı deponuza gönderin.
+   ```sh
    git push origin new-feature-x
-   
-7. *Submit a Pull Request*: Orijinal proje deposuna karşı bir PR oluşturun. Değişiklikleri ve motivasyonlarını açıkça tanımlayın.
-8. *Review*: PR'niz incelenip onaylandıktan sonra ana şubeye birleştirilecektir. Katkınız için tebrikler!
+   ```
+7. **Submit a Pull Request**: Orijinal proje deposuna karşı bir PR oluşturun. Değişiklikleri ve motivasyonlarını açıkça tanımlayın.
+8. **Review**: PR'niz incelenip onaylandıktan sonra ana şubeye birleştirilecektir. Katkınız için tebrikler!
 </details>
 
 
 ### <summary>ER Diyagramı</summary>
 <br>
 <p align="left">
-   
-      <img src="https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/erd.png">
+<img src="[erDiagram](https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/erd.png)">
 
    
 </p>
 
 
 </details>
+
+
