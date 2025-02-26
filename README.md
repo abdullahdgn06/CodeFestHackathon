@@ -407,6 +407,21 @@ Aşağıdaki komutu kullanarak test takımını çalıştırın:
 </p>
 
 
+### <summary>Katkıda Bulunanlar</summary>
+<br>
+<p align="left">
+   <a href="https://github.com/abdullahdgn06">
+      <img src="https://contrib.rocks/image?repo=abdullahdgn06/CodeFestHackathon">
+      
+   </a>
+   
+   <a href="https://github.com/ozertugrul">
+      <img src="https://contrib.rocks/image?repo=ozertugrul/car-motorcycle-classification-by-dl">
+   </a>
+   
+   
+</p>
+
 </details>
 
 
