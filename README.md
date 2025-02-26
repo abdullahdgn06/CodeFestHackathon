@@ -1,7 +1,7 @@
 <p align="center">
     <img src="https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/logo.png" align="center" width="30%">
 </p>
-<p align="center"><h1 align="center">CODEFESTHACKATHON</h1></p>
+<p align="center"><h1 align="center">CODEFESTHACKATHON - LLMCİNİ</h1></p>
 <p align="center">
 	<em> TherapyZ, yapay zeka destekli bir psikolojik destek platformudur. Kullanıcılara 7/24 erişilebilir, güvenli ve kişiselleştirilmiş terapi hizmeti sunar. Yapay zeka destekli sohbet sistemi sayesinde, kullanıcıların psikolojik durumlarını değerlendirmelerine ve destek almalarına yardımcı olur. </em>
 </p>
