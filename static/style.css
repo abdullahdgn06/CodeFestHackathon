@@ -396,8 +396,7 @@ p.secondary {
     max-width: 850px;
     text-align: center;
     padding: 20px 45px;
-    background: var(--color-main);  /* Arka plan rengi */
-    box-shadow: 0 -10px 20px rgba(0, 0, 0, 0.1);  /* Üst gölge */
+   
     z-index: 10;  /* Üstte görünmesi için */
 }
 

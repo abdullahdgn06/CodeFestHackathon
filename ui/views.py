@@ -4,9 +4,11 @@ from django.http import JsonResponse
 from django.views.generic import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.forms import UserCreationForm
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from .models import Conversation, Message, PsychologicalSurvey
 from django.contrib.auth.models import User
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
 
 
 # Anasayfa view'i
@@ -247,3 +249,38 @@ def save_survey(request):
         except Exception as e:
             return JsonResponse({'success': False, 'error': str(e)})
     return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+@login_required
+def profile(request):
+    if request.method == 'POST':
+        if 'update_profile' in request.POST:
+            # Profil güncelleme
+            first_name = request.POST.get('first_name')
+            last_name = request.POST.get('last_name')
+            
+            user = request.user
+            user.first_name = first_name
+            user.last_name = last_name
+            user.save()
+            
+            messages.success(request, 'Profil bilgileriniz başarıyla güncellendi.')
+            
+        elif 'change_password' in request.POST:
+            # Şifre değiştirme
+            form = PasswordChangeForm(request.user, request.POST)
+            if form.is_valid():
+                user = form.save()
+                update_session_auth_hash(request, user)
+                messages.success(request, 'Şifreniz başarıyla güncellendi!')
+            else:
+                messages.error(request, 'Lütfen hataları düzeltin.')
+                return render(request, 'ui/profile.html', {
+                    'password_form': form,
+                    'active_tab': 'password'
+                })
+                
+    password_form = PasswordChangeForm(request.user)
+    return render(request, 'ui/profile.html', {
+        'password_form': password_form,
+        'active_tab': request.POST.get('active_tab', 'profile')
+    })

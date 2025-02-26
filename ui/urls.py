@@ -12,5 +12,6 @@ urlpatterns = [
     path('delete_conversation/<int:conversation_id>/', views.delete_conversation, name='delete_conversation'),
     path('register/', views.register, name='register'),
     path('save_survey/', views.save_survey, name='save_survey'),  # Anket kaydetme URL'i
+    path('profile/', views.profile, name='profile'),  # Profil sayfası için URL
 ]
 
