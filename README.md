@@ -401,7 +401,7 @@ Aşağıdaki komutu kullanarak test takımını çalıştırın:
 ### <summary>ER Diyagramı</summary>
 <br>
 <p align="left">
-<img src="[erDiagram](https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/erd.png)">
+<img src="https://raw.githubusercontent.com/abdullahdgn06/CodeFestHackathon/refs/heads/main/img/erd.png">
 
    
 </p>
