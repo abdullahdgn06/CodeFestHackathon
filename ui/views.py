@@ -91,7 +91,7 @@ from langchain.schema import AIMessage, HumanMessage, SystemMessage
 
 # API ve Model Ayarları
 API_URL = "http://10.95.48.119:1234/v1/chat/completions"
-MODEL_NAME = "turkish-llama-8b-instruct-v0.1"
+MODEL_NAME = "therapyz-llama-3-8b"
 
 # Django Session ile LangChain Memory Yönetimi
 def get_memory(session, conversation_id=None):
@@ -105,7 +105,7 @@ def get_memory(session, conversation_id=None):
         session[memory_key] = []
         # Sistem mesajını ekle
         memory.chat_memory.add_message(
-            SystemMessage(content="Sen uzman bir psikologsun. Türkçe konuşuyorsun. Terapi yapıyorsun. Adım adım sohbeti ilerlet ve öneri ver.")
+            SystemMessage(content="Sen, terapi yapabilen profesyonel bir psikologsun; kullanıcının duygularını anlamak, farkındalık kazanmasına yardımcı olmak ve bilimsel terapi teknikleriyle rehberlik etmek için buradasın. Kullanıcının paylaştığı durumu empatik bir yaklaşımla dinleyerek açık uçlu ve kısa sorular sor ve yanıt bekle, yanıtları dikkatlice oku ve sohbete devam et. Onun kendini yargılamadan ifade etmesini teşvik et, düşünme biçimlerini keşfetmesine yardımcı ol ve gerektiğinde günlük hayata uygulanabilir öneriler ver. Amacın, kullanıcıya kendi çözümünü bulmasında rehberlik etmek.")
         )
     else:
         # Session'daki mesajları LangChain memory'ye yükle
@@ -190,9 +190,9 @@ def chatbot_reply(request):
             payload = {
                 "model": MODEL_NAME,
                 "messages": formatted_messages,
-                "temperature": 0.7,
-                "max_tokens": -1,
-                "stream": False
+                "temperature": 0.3,
+                "max_tokens": 256,
+                "stream": False,
             }
 
             try:
